@@ -1,0 +1,34 @@
+{
+  "name": "dirigera-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IKEA Smart Plug Power Monitoring Dashboard",
+  "author": "",
+  "scripts": {
+    "prepare": "husky",
+    "dev": "pnpm --parallel -r dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm -r test:coverage",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "security": "pnpm audit --audit-level=moderate"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "typescript": "^5.7.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "resize-observer-polyfill": "^1.5.1"
+  }
+}

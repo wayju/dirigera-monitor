@@ -1,0 +1,38 @@
+# Test compose file - uses local SQLite, different ports
+# Usage: docker compose -f docker-compose.test.yml up --build
+
+services:
+  collector:
+    build:
+      context: ./apps/collector
+      dockerfile: Dockerfile
+    container_name: dirigera-collector-test
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=file:/app/data/dirigera_monitor.db
+      - DIRIGERA_HUB_IP=${DIRIGERA_HUB_IP}
+      - DIRIGERA_TOKEN=${DIRIGERA_TOKEN}
+      - POLL_INTERVAL_MINUTES=${POLL_INTERVAL_MINUTES:-5}
+      - PORT=3001
+    ports:
+      - "8352:3001"
+    # Skip migrations since SQLite auto-creates
+    command: ["node", "dist/index.js"]
+
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: Dockerfile
+    container_name: dirigera-dashboard-test
+    restart: unless-stopped
+    depends_on:
+      collector:
+        condition: service_healthy
+    environment:
+      # Runtime configuration - no rebuild needed
+      - API_URL=http://localhost:8352
+      - PORT=3000
+    ports:
+      - "4000:3000"

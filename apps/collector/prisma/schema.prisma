@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Device {
+  id         String   @id @default(uuid())
+  dirigeraId String   @unique @map("dirigera_id")
+  name       String
+  room       String?
+  model      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  readings         Reading[]
+  hourlySummaries  HourlySummary[]
+  dailySummaries   DailySummary[]
+  monthlySummaries MonthlySummary[]
+
+  @@map("devices")
+}
+
+model Reading {
+  id          String   @id @default(uuid())
+  deviceId    String   @map("device_id")
+  timestamp   DateTime @default(now())
+  powerWatts  Float    @map("power_watts")
+  voltage     Float
+  currentAmps Float    @map("current_amps")
+  energyKwh   Float    @map("energy_kwh")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId, timestamp])
+  @@map("readings")
+}
+
+model HourlySummary {
+  id        String   @id @default(uuid())
+  deviceId  String   @map("device_id")
+  hourStart DateTime @map("hour_start")
+  avgPower  Float    @map("avg_power")
+  maxPower  Float    @map("max_power")
+  minPower  Float    @map("min_power")
+  energyKwh Float    @map("energy_kwh")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, hourStart])
+  @@index([deviceId, hourStart])
+  @@map("hourly_summaries")
+}
+
+model DailySummary {
+  id        String   @id @default(uuid())
+  deviceId  String   @map("device_id")
+  date      DateTime
+  avgPower  Float    @map("avg_power")
+  maxPower  Float    @map("max_power")
+  minPower  Float    @map("min_power")
+  energyKwh Float    @map("energy_kwh")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, date])
+  @@index([deviceId, date])
+  @@map("daily_summaries")
+}
+
+model MonthlySummary {
+  id        String @id @default(uuid())
+  deviceId  String @map("device_id")
+  yearMonth String @map("year_month") // Format: "2025-01"
+  avgPower  Float  @map("avg_power")
+  maxPower  Float  @map("max_power")
+  minPower  Float  @map("min_power")
+  energyKwh Float  @map("energy_kwh")
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceId, yearMonth])
+  @@index([deviceId, yearMonth])
+  @@map("monthly_summaries")
+}

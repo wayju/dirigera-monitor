@@ -1,0 +1,21 @@
+#!/bin/sh
+
+echo "Running pre-commit checks..."
+
+# Increment version build numbers
+echo "📦 Incrementing build version..."
+node scripts/increment-version.js
+
+# TypeScript type checking
+echo "📝 Type checking..."
+pnpm typecheck || exit 1
+
+# Run tests with coverage
+echo "🧪 Running tests with coverage..."
+pnpm test:coverage || exit 1
+
+# Security audit
+echo "🔒 Security audit..."
+pnpm security || echo "⚠️  Security audit completed with warnings"
+
+echo "✅ All pre-commit checks passed!"

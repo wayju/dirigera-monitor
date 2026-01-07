@@ -1,0 +1,52 @@
+# Production Deployment compose file
+# Copy this file and .env to your server, then run:
+#   docker compose -f docker-compose.nas.yml up -d
+#
+# Access:
+#   - Dashboard: http://<YOUR_SERVER_IP>:7353
+#   - API: http://<YOUR_SERVER_IP>:7352
+#
+# Required environment variables in .env:
+#   - DIRIGERA_TOKEN: Your DIRIGERA hub token
+#   - DIRIGERA_HUB_IP: IP of your DIRIGERA hub
+#   - API_URL: Full URL to reach the collector API (e.g., http://192.168.1.100:7352)
+
+services:
+  collector:
+    image: ghcr.io/${GHCR_REPO:-your-username/dirigera-dashboard}/collector:latest
+    build:
+      context: ./apps/collector
+      dockerfile: Dockerfile
+    container_name: dirigera-collector
+    restart: unless-stopped
+    volumes:
+      - sqlite-data:/app/data
+    environment:
+      - DATABASE_URL=file:/app/data/dirigera_monitor.db
+      - DIRIGERA_HUB_IP=${DIRIGERA_HUB_IP}
+      - DIRIGERA_TOKEN=${DIRIGERA_TOKEN}
+      - POLL_INTERVAL_MINUTES=${POLL_INTERVAL_MINUTES:-5}
+      - PORT=3001
+    ports:
+      - "${COLLECTOR_PORT:-7352}:3001"
+
+  dashboard:
+    image: ghcr.io/${GHCR_REPO:-your-username/dirigera-dashboard}/dashboard:latest
+    build:
+      context: ./apps/dashboard
+      dockerfile: Dockerfile
+    container_name: dirigera-dashboard
+    restart: unless-stopped
+    depends_on:
+      collector:
+        condition: service_healthy
+    environment:
+      # API_URL is injected at container startup - no rebuild needed!
+      - API_URL=${API_URL:-http://localhost:7352}
+      - PORT=3000
+    ports:
+      - "${DASHBOARD_PORT:-7353}:3000"
+
+volumes:
+  sqlite-data:
+    driver: local

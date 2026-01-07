@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+out/
+.turbo/
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.*.local
+apps/**/.env
+!**/.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Prisma / SQLite
+*.db
+*.db-journal
+ikea_power.db
+
+# Next.js
+.next/
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+
+# Docker volumes
+pgdata/
+
+# Task output files (claude code)
+/tmp/
