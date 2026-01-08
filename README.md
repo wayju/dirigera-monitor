@@ -1,6 +1,6 @@
 # DIRIGERA Power Monitor
 
-Monitor power consumption from IKEA DIRIGERA smart plugs with a beautiful real-time dashboard.
+Monitor power consumption from IKEA DIRIGERA smart plugs with a real-time dashboard.
 
 ## Disclaimer
 
